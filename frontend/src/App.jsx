@@ -443,11 +443,11 @@ function detectLang(text) {
 }
 
 function getSeason() {
-  const m = new Date().getMonth() + 1;
-  if (m >= 6 && m <= 9)  return { name:"Monsoon",      emoji:"🌧️", risk:"Dengue, Malaria, Typhoid, Waterborne diseases — HIGH risk season" };
-  if (m >= 3 && m <= 5)  return { name:"Summer",       emoji:"☀️", risk:"Heat stroke, Dehydration, Food poisoning — HIGH risk season" };
-  if (m <= 2 || m === 12) return { name:"Winter",      emoji:"❄️", risk:"Respiratory infections, Pneumonia, Asthma — HIGH risk season" };
-  return                         { name:"Post-Monsoon", emoji:"🍂", risk:"Dengue and Chikungunya cases may still be elevated" };
+  const m = new Date().getMonth() + 1; // 1 = January … 12 = December
+  if (m >= 6 && m <= 9)        return { name:"Monsoon",      emoji:"🌧️", risk:"Dengue, Malaria, Typhoid, Waterborne diseases — HIGH risk season" };
+  else if (m >= 3 && m <= 5)   return { name:"Summer",       emoji:"☀️",  risk:"Heat stroke, Dehydration, Food poisoning — HIGH risk season" };
+  else if (m === 12 || m <= 2) return { name:"Winter",       emoji:"❄️",  risk:"Respiratory infections, Pneumonia, Asthma — HIGH risk season" };
+  else                          return { name:"Post-Monsoon", emoji:"🍂",  risk:"Dengue and Chikungunya cases may still be elevated (Oct–Nov)" };
 }
 
 function buildMessage(profile, symptoms, lang) {
@@ -513,9 +513,9 @@ const DOCTORS = [
 //  TRANSLATIONS
 // ────────────────────────────────────────────────────────────────
 const T = {
-  en: { name:"Arogya Sahayak", tagline:"Free AI Health Companion · No Internet Needed", chat:"Chat", docs:"Doctors", about:"About", ph:"Describe your symptoms (English, Hindi, Tamil)...", send:"Send", mic:"Tap to Speak", listening:"Listening...", welcome:"Namaste! 🙏", welcomeText:"Tell me your symptoms in English, Hindi, or Tamil. I'll assess your condition, suggest home remedies, and connect you to a doctor — 100% free, no internet needed.", triage:"Health Assessment", syms:"Symptoms Identified", conds:"Possible Conditions", rems:"Home Remedies", diet:"Dietary Advice", doc:"When to See Doctor", ayu:"Ayurvedic Tip", nearDocs:"Nearby Telemedicine Doctors", book:"Book Now", emergency:"🚨 EMERGENCY — CALL 108 NOW!", micDenied:"Mic denied. Please type.", noVoice:"Voice not supported here.", free:"100% Free · No API · Works Offline" },
-  hi: { name:"आरोग्य सहायक", tagline:"मुफ्त AI स्वास्थ्य साथी · इंटरनेट नहीं चाहिए", chat:"चैट", docs:"डॉक्टर", about:"जानकारी", ph:"अपने लक्षण बताएं (हिंदी, अंग्रेजी, तमिल)...", send:"भेजें", mic:"बोलने के लिए दबाएं", listening:"सुन रहा है...", welcome:"नमस्ते! 🙏", welcomeText:"हिंदी, अंग्रेजी या तमिल में लक्षण बताएं। पूरी तरह मुफ्त।", triage:"स्वास्थ्य आकलन", syms:"पहचाने लक्षण", conds:"संभावित बीमारी", rems:"घरेलू उपाय", diet:"खान-पान सलाह", doc:"डॉक्टर कब मिलें", ayu:"आयुर्वेदिक टिप", nearDocs:"नजदीकी डॉक्टर", book:"अभी बुक करें", emergency:"🚨 आपातकाल — अभी 108 कॉल करें!", micDenied:"माइक अनुमति नहीं। टाइप करें।", noVoice:"वॉइस समर्थित नहीं।", free:"100% मुफ्त · बिना इंटरनेट" },
-  ta: { name:"ஆரோக்கிய சகாயகன்", tagline:"இலவச AI சுகாதார தோழன் · இணையம் தேவையில்லை", chat:"அரட்டை", docs:"மருத்துவர்", about:"பற்றி", ph:"உங்கள் அறிகுறிகளை சொல்லுங்கள் (தமிழ், ஆங்கிலம், இந்தி)...", send:"அனுப்பு", mic:"பேச தட்டவும்", listening:"கேட்கிறேன்...", welcome:"வணக்கம்! 🙏", welcomeText:"தமிழ், ஆங்கிலம் அல்லது இந்தியில் அறிகுறிகளை சொல்லுங்கள். முழுவதும் இலவசம்.", triage:"சுகாதார மதிப்பீடு", syms:"அறியப்பட்ட அறிகுறிகள்", conds:"சாத்தியமான நோய்கள்", rems:"வீட்டு வைத்தியம்", diet:"உணவு ஆலோசனை", doc:"மருத்துவரை எப்போது", ayu:"ஆயுர்வேத குறிப்பு", nearDocs:"அருகில் மருத்துவர்கள்", book:"இப்போது பதிவு", emergency:"🚨 அவசரம் — 108 அழைக்கவும்!", micDenied:"மைக் அனுமதி இல்லை.", noVoice:"குரல் ஆதரிக்கப்படவில்லை.", free:"100% இலவசம் · இணையம் தேவையில்லை" },
+  en: { name:"Arogya Sahayak", tagline:"Free AI Health Companion · No Internet Needed", chat:"Chat", docs:"Doctors", about:"About", ph:"Describe your symptoms (English, Hindi, Tamil)...", send:"Send", mic:"Tap to Speak", listening:"Listening...", welcome:"Namaste! 🙏", welcomeText:"Tell me your symptoms in English, Hindi, or Tamil. I'll assess your condition, suggest home remedies, and connect you to a doctor — 100% free, no internet needed.", triage:"Health Assessment", syms:"Symptoms Identified", conds:"Possible Conditions", rems:"Home Remedies", diet:"Dietary Advice", doc:"When to See Doctor", ayu:"Ayurvedic Tip", nearDocs:"Nearby Telemedicine Doctors", book:"Book Now", emergency:"🚨 EMERGENCY — CALL 108 NOW!", micDenied:"Mic denied. Please type.", noVoice:"Voice not supported here.", free:"100% Free · No API Key · Works Offline" },
+  hi: { name:"आरोग्य सहायक", tagline:"मुफ्त AI स्वास्थ्य साथी · इंटरनेट नहीं चाहिए", chat:"चैट", docs:"डॉक्टर", about:"जानकारी", ph:"अपने लक्षण बताएं (हिंदी, अंग्रेजी, तमिल)...", send:"भेजें", mic:"बोलने के लिए दबाएं", listening:"सुन रहा है...", welcome:"नमस्ते! 🙏", welcomeText:"हिंदी, अंग्रेजी या तमिल में लक्षण बताएं। पूरी तरह मुफ्त — कोई API नहीं, इंटरनेट नहीं।", triage:"स्वास्थ्य आकलन", syms:"पहचाने लक्षण", conds:"संभावित बीमारी", rems:"घरेलू उपाय", diet:"खान-पान सलाह", doc:"डॉक्टर कब मिलें", ayu:"आयुर्वेदिक टिप", nearDocs:"नजदीकी डॉक्टर", book:"अभी बुक करें", emergency:"🚨 आपातकाल — अभी 108 कॉल करें!", micDenied:"माइक अनुमति नहीं। टाइप करें।", noVoice:"वॉइस समर्थित नहीं।", free:"100% मुफ्त · कोई API नहीं · ऑफलाइन काम करता है" },
+  ta: { name:"ஆரோக்கிய சகாயகன்", tagline:"இலவச AI சுகாதார தோழன் · இணையம் தேவையில்லை", chat:"அரட்டை", docs:"மருத்துவர்", about:"பற்றி", ph:"உங்கள் அறிகுறிகளை சொல்லுங்கள் (தமிழ், ஆங்கிலம், இந்தி)...", send:"அனுப்பு", mic:"பேச தட்டவும்", listening:"கேட்கிறேன்...", welcome:"வணக்கம்! 🙏", welcomeText:"தமிழ், ஆங்கிலம் அல்லது இந்தியில் அறிகுறிகளை சொல்லுங்கள். முழுவதும் இலவசம் — API இல்லை, இணையம் தேவையில்லை.", triage:"சுகாதார மதிப்பீடு", syms:"அறியப்பட்ட அறிகுறிகள்", conds:"சாத்தியமான நோய்கள்", rems:"வீட்டு வைத்தியம்", diet:"உணவு ஆலோசனை", doc:"மருத்துவரை எப்போது", ayu:"ஆயுர்வேத குறிப்பு", nearDocs:"அருகில் மருத்துவர்கள்", book:"இப்போது பதிவு", emergency:"🚨 அவசரம் — 108 அழைக்கவும்!", micDenied:"மைக் அனுமதி இல்லை.", noVoice:"குரல் ஆதரிக்கப்படவில்லை.", free:"100% இலவசம் · API இல்லை · ஆஃப்லைனில் வேலை செய்யும்" },
 };
 
 const URGENCY_CFG = {
@@ -886,7 +886,7 @@ export default function ArogyaSahayak() {
             <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl p-5 text-white text-center">
               <div className="text-5xl mb-3">🌿</div>
               <h2 className="text-2xl font-black">{t.name}</h2>
-              <p className="text-white/75 text-sm mt-1">ET-Gen AI Hackathon 2024</p>
+              <p className="text-white/75 text-sm mt-1">ET-Gen AI Hackathon 2026</p>
               <div className="grid grid-cols-3 gap-3 mt-4">
                 {[["100%","Free Forever"],["3","Languages"],["25+","Diseases"]].map(([n,l])=>(
                   <div key={n} className="bg-white/20 rounded-xl p-2"><p className="font-black text-2xl">{n}</p><p className="text-white/70 text-[10px]">{l}</p></div>
