@@ -549,6 +549,9 @@ function playClick(type = "tap") {
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.07);
     }
     osc.start(ctx.currentTime); osc.stop(ctx.currentTime + 0.22);
+    // FIX: close AudioContext after playback — Chrome limits to 6 simultaneous
+    // contexts; without this, sounds stop working after 6 button taps
+    osc.onended = () => ctx.close();
   } catch (_) {}
 }
 
@@ -710,17 +713,20 @@ export default function ArogyaSahayak() {
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior:"smooth" }); }, [messages, busy]);
   useEffect(() => () => recogRef.current?.stop(), []);
 
-  const handleSend = useCallback(() => {
-    const text = input.trim();
-    if (!text || busy) return;
+  // submitText(text) — core logic used by BOTH manual send AND voice auto-submit.
+  // Takes text as a parameter so it never reads from stale `input` state.
+  // FIX (Bug 1): Previously handleSend read from `input` state, which is async —
+  // calling it right after setInput() from voice onresult would always see "" (empty).
+  const submitText = useCallback((text) => {
+    const trimmed = text.trim();
+    if (!trimmed || busy) return;
     playClick("send");
-    setMessages(p => [...p, { role:"user", content:text }]);
+    setMessages(p => [...p, { role:"user", content:trimmed }]);
     setInput("");
     setWelcome(false);
     setBusy(true);
-    // Run local triage after short "thinking" delay
     setTimeout(() => {
-      const result = runTriage(text);
+      const result = runTriage(trimmed);
       setTriage(result);
       const fq = result.follow_up_questions?.length
         ? `\n\n💭 Please also tell me:\n${result.follow_up_questions.map(q=>`• ${q}`).join("\n")}`
@@ -730,7 +736,11 @@ export default function ArogyaSahayak() {
       playClick("receive");
       if (["high","emergency"].includes(result.urgency)) setTimeout(()=>setTab("doctors"),1800);
     }, 850);
-  }, [input, busy]);
+  }, [busy]);
+
+  const handleSend = useCallback(() => {
+    submitText(input);
+  }, [input, submitText]);
 
   const startMic = useCallback(() => {
     playClick();
@@ -738,13 +748,47 @@ export default function ArogyaSahayak() {
     if (!SR) { setMicErr(t.noVoice); return; }
     const r = new SR();
     r.lang = { en:"en-IN", hi:"hi-IN", ta:"ta-IN" }[lang] || "en-IN";
+    // FIX (Bug 4): explicitly set these — some mobile browsers have inconsistent defaults
+    r.continuous     = false;
+    r.interimResults = false;
+
+    // FIX (Bug 1): store transcript in a local closure variable, NOT in React state.
+    // React state (setInput) is async — reading `input` state immediately after
+    // setInput() still returns the OLD value. Using a local var avoids that entirely.
+    let transcript = "";
+
     r.onstart  = () => { setMic(true); setMicErr(""); };
-    r.onresult = e  => setInput(e.results[0][0].transcript);
-    r.onerror  = e  => { setMic(false); if (e.error==="not-allowed") setMicErr(t.micDenied); };
-    r.onend    = ()  => setMic(false);
+    r.onresult = (e) => {
+      // Join all result segments (robust for any browser returning multiple chunks)
+      transcript = Array.from(e.results)
+        .map(res => res[0].transcript)
+        .join(" ")
+        .trim();
+      setInput(transcript); // show live text in the input box
+    };
+    r.onerror  = (e) => {
+      setMic(false);
+      // FIX (Bug 3): previously only "not-allowed" was handled; all other errors
+      // (no-speech, network, audio-capture) silently stopped the mic with no feedback
+      if (e.error === "not-allowed" || e.error === "permission-denied") {
+        setMicErr(t.micDenied);
+      } else if (e.error === "no-speech") {
+        setMicErr("No speech detected. Please try again.");
+      } else {
+        setMicErr("Voice error: " + e.error + ". Please try again or type.");
+      }
+    };
+    r.onend    = () => {
+      setMic(false);
+      // FIX (Bug 1): auto-submit using the local closure var — guaranteed to have
+      // the transcript even though React's `input` state may not have updated yet
+      if (transcript.trim()) {
+        submitText(transcript.trim());
+      }
+    };
     recogRef.current = r;
-    try { r.start(); } catch { setMicErr(t.micDenied); }
-  }, [lang, t]);
+    try { r.start(); } catch (_) { setMicErr(t.micDenied); }
+  }, [lang, t, submitText]);
 
   const handleBook = (doc) => {
     setBooked(doc);
